@@ -62,9 +62,9 @@ double ArraySentiment::calculateSentimentScore(int posCount, int negCount) {
     int maxRawScore = N;
     int rawSentimentScore = posCount - negCount;
 
-    if (N == 0) return 3.0;  // Neutral if no positive/negative words found
+    if (N == 0) return 3.0;  
 
     double normalizedScore = (rawSentimentScore - minRawScore) / (double)(maxRawScore - minRawScore);
-    return 1 + 4 * normalizedScore;  // Convert to a score between 1 and 5
+    return 1 + 4 * normalizedScore;  
 }
 

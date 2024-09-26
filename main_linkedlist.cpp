@@ -1,12 +1,12 @@
-#include "ArraySentiment.hpp"
+#include "LinkedListSentiment.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <ctime>
 
-// Define maximum number of reviews and words
-const int MAX_REVIEWS = 25000;
-const int MAX_WORDS = 25000;  
+// Define constants for the maximum number of reviews
+const int MAX_REVIEWS = 20491;
+
 // Function to read reviews and ratings from CSV file
 int readReviewsFromCSV(const std::string& filename, std::string reviews[], int ratings[]) {
     std::ifstream file(filename);
@@ -48,8 +48,8 @@ int readReviewsFromCSV(const std::string& filename, std::string reviews[], int r
 }
 
 int main() {
-    ArraySentiment arraySentiment;
-    arraySentiment.loadWords("positive-words.txt", "negative-words.txt");
+    LinkedListSentiment linkedListSentiment;
+    linkedListSentiment.loadWords("positive-words.txt", "negative-words.txt");
 
     std::string reviews[MAX_REVIEWS];  
     int ratings[MAX_REVIEWS];          
@@ -59,36 +59,23 @@ int main() {
 
     // Analyze each review
     for (int i = 0; i < reviewCount; i++) {
-        int posCount, negCount, posWordCount, negWordCount;
-        std::string posWords[MAX_WORDS];  
-        std::string negWords[MAX_WORDS];  
+        int posCount = 0, negCount = 0;
+        Node* posWordsUsed = nullptr;
+        Node* negWordsUsed = nullptr;
 
         // Analyze the review
-        arraySentiment.analyzeReview(reviews[i], posCount, negCount, posWords, negWords, posWordCount, negWordCount);
+        linkedListSentiment.analyzeReview(reviews[i], posCount, negCount, posWordsUsed, negWordsUsed);
 
         // Display positive and negative words
         std::cout << "Review " << i + 1 << ":\nPositive words: " << posCount << "\n";
-        for (int j = 0; j < posWordCount; ++j) {
-            std::cout << "- " << posWords[j] << "\n";
-        }
+        linkedListSentiment.printWordsUsed(posWordsUsed);
         std::cout << "Negative words: " << negCount << "\n";
-        for (int j = 0; j < negWordCount; ++j) {
-            std::cout << "- " << negWords[j] << "\n";
-        }
+        linkedListSentiment.printWordsUsed(negWordsUsed);
 
         // Calculate and display sentiment score
-        double sentimentScore = arraySentiment.calculateSentimentScore(posCount, negCount);
+        double sentimentScore = linkedListSentiment.calculateSentimentScore(posCount, negCount);
         std::cout << "Sentiment Score (1-5): " << sentimentScore << "\n";
         std::cout << "Rating provided by user: " << ratings[i] << "\n";
-
-        // Comparison
-        if (ratings[i] != (int)sentimentScore) {
-            std::cout << "User's rating doesn't match sentiment score.\n";
-        } else {
-            std::cout << "User's rating matches the sentiment score.\n";
-        }
-
-        std::cout << "-------------------\n";
     }
 
     clock_t end = clock();
@@ -96,6 +83,6 @@ int main() {
 
     std::cout << "Total time taken: " << duration << " seconds.\n";
 
-    return 0;
+    return 0;  
 }
 
