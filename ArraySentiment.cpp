@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 
+
 ArraySentiment::ArraySentiment() {
     positiveWords = new std::string[25000];
     negativeWords = new std::string[25000];
@@ -67,4 +68,3 @@ double ArraySentiment::calculateSentimentScore(int posCount, int negCount) {
     double normalizedScore = (rawSentimentScore - minRawScore) / (double)(maxRawScore - minRawScore);
     return 1 + 4 * normalizedScore;  
 }
-
