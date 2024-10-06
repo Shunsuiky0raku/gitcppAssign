@@ -26,8 +26,6 @@ void addWordToFrequency(WordFrequency freqArray[], int& size, const std::string&
     freqArray[size].count = 1;
     size++;
 }
-
-// Function to read reviews and ratings from CSV file
 int readReviewsFromCSV(const std::string& filename, std::string reviews[], int ratings[]) {
     std::ifstream file(filename);
     std::string line;
@@ -38,27 +36,29 @@ int readReviewsFromCSV(const std::string& filename, std::string reviews[], int r
         return 0;
     }
 
-    // Skip the header
+    // Skip the header (if present)
     std::getline(file, line);
 
     // Read each line from the CSV
     while (std::getline(file, line) && count < MAX_REVIEWS) {
-        std::stringstream ss(line);
-        std::string review, ratingStr;
-
-        // Extract the review (first column) and the rating (second column)
-        std::getline(ss, review, ',');    // First column: Review text
-        std::getline(ss, ratingStr, ',');  // Second column: User rating
-
+        size_t lastComma = line.find_last_of(',');
+        if (lastComma == std::string::npos) {
+      std::cerr << "Error: Invalid CSV format at line" << count + 1 <<std::endl;
+      continue;
+    }
+        //Extract review (everything before the last comma)
+        std::string review = line.substr(0, lastComma);
+    // Extract ratuing (everythhing after the last comma)
+        std::string ratingStr = line.substr(lastComma + 1);
         // Store the review and rating
         reviews[count] = review;
 
-        // Try to convert the rating from string to integer
+        // Convert the rating from string to integer
         try {
-            ratings[count] = std::stoi(ratingStr);
+            ratings[count] = std::stoi(ratingStr);  // Convert string to int
         } catch (const std::invalid_argument& e) {
             std::cerr << "Invalid rating at line " << count + 1 << ": " << ratingStr << std::endl;
-            ratings[count] = 0;  // Assign a default value in case of invalid rating
+            ratings[count] = 0;  // Assign a default value if rating is invalid
         }
 
         count++;
@@ -97,7 +97,7 @@ int main() {
 
     std::string reviews[MAX_REVIEWS];  // Array for reviews
     int ratings[MAX_REVIEWS];          // Array for ratings
-    double sentimentScores[MAX_REVIEWS];  // Array to store sentiment scores
+    float sentimentScores[MAX_REVIEWS];  // Array to store sentiment scores
     WordFrequency freqArray[MAX_WORDS];  // Array to track word frequencies
     int freqSize = 0;  // Size of the frequency array
 
@@ -116,7 +116,7 @@ int main() {
         int posWordCount = 0, negWordCount = 0;
 
         // Analyze the review
-        arraySentiment.analyzeReview(reviews[i], posCount, negCount, posWords, negWords, posWordCount, negWordCount);
+        arraySentiment.analyzeReview(reviews[i],posCount, negCount, posWords, negWords, posWordCount, negWordCount);
 
         // Add words to the frequency array
         for (int j = 0; j < posWordCount; ++j) {
@@ -135,6 +135,7 @@ int main() {
 
         // Display number of positive and negative words
         std::cout << "Review: " << reviews[i] << std::endl;
+        std::cout << "Rating: " << ratings[i] << std::endl;
         std::cout << "Positive words: " << posCount << std::endl;
         for (int j = 0; j < posWordCount; ++j) {
             std::cout << "- " << posWords[j] << std::endl;
@@ -166,6 +167,7 @@ int main() {
         std::cout << "Rating given by user: " << ratings[i] << std::endl;
         std::cout << std::fixed << std::setprecision(2);  // Set precision to 2 decimal places
         std::cout << "Sentiment score (1 to 5) is " << sentimentScores[i] << std::endl;
+        std::cout << "Rating given by user: " << ratings[i] << std::endl;
         std::cout << "----------------------------" << std::endl;
     }
 
